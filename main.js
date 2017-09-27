@@ -1,6 +1,8 @@
 const electron = require('electron')
 // Module to control application life.
 const app = electron.app
+const Tray = electron.Tray;
+const Menu = electron.Menu;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow
 
@@ -12,6 +14,17 @@ const url = require('url')
 let mainWindow
 
 function createWindow () {
+
+  tray = new Tray('tray_icon.jpg')
+  const contextMenu = Menu.buildFromTemplate([
+    {label: 'Item1', type: 'radio'},
+    {label: 'Item2', type: 'radio'},
+    {label: 'Item3', type: 'radio', checked: true},
+    {label: 'Item4', type: 'radio'}
+  ])
+  tray.setToolTip('This is my application.')
+  tray.setContextMenu(contextMenu)
+
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600})
 
@@ -21,6 +34,18 @@ function createWindow () {
     protocol: 'file:',
     slashes: true
   }))
+
+  mainWindow.webContents.on('did-finish-load', function(event) {
+    mainWindow.openDevTools();
+
+    const {dialog} = require('electron');
+    var options = {};
+    options.title = 'Warning';
+    options.type = "warning";
+    options.message = "This is a modal dialog";
+    dialog.showMessageBox(mainWindow, options, () =>{
+    });
+  });
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
